@@ -1,4 +1,3 @@
-import java.io.*;
 import java.util.*;
 
 public class EightQueen {
@@ -8,6 +7,10 @@ public class EightQueen {
     public EightQueen() {
         open = new PriorityQueue<>();
         closed = new PriorityQueue<>();
+    }
+
+    public double getCost(Board n) {
+        return 1;
     }
 
     public void expand(State n) {
@@ -69,6 +72,7 @@ public class EightQueen {
                 System.out.println("Solution : " + count++ + ", Cost : " + n.getCost());
                 printState(n);
                 System.out.println();
+                break;
             } else {
                 expand(n);
             }
