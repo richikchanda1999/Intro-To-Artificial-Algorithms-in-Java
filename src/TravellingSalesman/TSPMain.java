@@ -8,24 +8,15 @@ import java.util.Random;
 
 public class TSPMain {
     static void solve(BufferInput bi, BufferOutput bo) throws IOException {
-        bo.writeString("Enter no. of cities : ");
-        bo.flush();
-        int N = bi.nextInt();
-
-        bo.writeString("Enter maximum cost : ");
-        bo.flush();
-        int cMax = bi.nextInt();
-
+        int N = 4;
         int cost[][] = new int[N][N];
-        Random random = new Random();
-        for (int i = 0; i < N; ++i)
-            for (int j = i + 1; j < N; ++j) cost[i][j] = (int) (1 + (int) (random.nextDouble() * (cMax - 1)));
-
-        for (int i = 0; i < N; ++i) cost[i][i] = 0;
-
-        for (int i = 0; i < N; ++i)
-            for (int j = 0; j < i; ++j) cost[i][j] = cost[j][i];
-
+        cost[0][0] = cost[1][1] = cost[2][2] = cost[3][3] = 0;
+        cost[0][1] = cost[1][0] = 9;
+        cost[0][2] = cost[2][0] = 4;
+        cost[0][3] = cost[3][0] = 6;
+        cost[1][2] = cost[2][1] = 4;
+        cost[1][3] = cost[3][1] = 7;
+        cost[2][3] = cost[3][2] = 1;
 
         bo.writeString("Generated graph is :\n");
         bo.flush();

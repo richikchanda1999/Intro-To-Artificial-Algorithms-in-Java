@@ -42,7 +42,7 @@ public class TSP_A_Star {
             currentCity = openList.poll().cityId;
             visited[currentCity] = numOfVisited++;
         }
-        System.out.println(Arrays.toString(visited));
+        //System.out.println(Arrays.toString(visited));
         this.calPath(cost);
     }
 
@@ -53,7 +53,7 @@ public class TSP_A_Star {
                     this.path[i - 1] = j + 1;
                 }
         }
-        System.out.println(Arrays.toString(path));
+        //System.out.println(Arrays.toString(path));
         long tempTotalCost = 0;
         for (int i = 0; i < this.visited.length - 1; i++) {
             if(path[i] != 0 && path[i + 1] != 0) tempTotalCost += cost[path[i] - 1][path[i + 1] - 1];

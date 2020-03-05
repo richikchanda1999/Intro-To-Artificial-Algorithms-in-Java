@@ -9,8 +9,18 @@ public class EightQueen {
         closed = new PriorityQueue<>();
     }
 
-    public double getCost(Board n) {
-        return 1;
+    public int getCost(Board n) {
+        int cost = 0;
+
+        int queens[] = n.getQueens();
+        for(int i = 0 ; i < MAX ; ++i) {
+            for(int j = 0 ; j < MAX ; ++j) {
+                if(i == j) continue;
+                if(queens[i] == queens[j]) cost += 1;
+                if(Math.abs(queens[i] - queens[j]) == Math.abs(i - j)) cost += 1;
+            }
+        }
+        return cost;
     }
 
     public void expand(State n) {
@@ -24,7 +34,7 @@ public class EightQueen {
                 int[] temp = Arrays.copyOf(queens, queens.length);
                 temp[index] = i;
                 Board b = new Board(temp, index + 1);
-                open.add(new State(b, n.getCost() + 1));
+                open.add(new State(b, getCost(n.getBoard())));
             }
         }
     }
