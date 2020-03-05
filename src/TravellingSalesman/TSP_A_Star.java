@@ -1,353 +1,88 @@
 package TravellingSalesman;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.PriorityQueue;
 
+
 public class TSP_A_Star {
-    static void printGraph(BufferOutput bo, Graph graph) throws IOException{
-        ArrayList<Vertex> vertices = graph.getVertices();
-        int N = vertices.size();
-        bo.writeString("Vertices : " + vertices);
-        bo.flush();
-        ArrayList<Edge<Vertex, Vertex>> edges = graph.getEdges();
-        Collections.sort(edges);
-        bo.writeString("\nEdges : \n");
-        bo.flush();
-        for(int i = 0 ; i < edges.size() ; ++i) {
-            Edge edge = edges.get(i);
-            bo.writeString(edge.toString());
-            bo.writeString("\n");
-            bo.flush();
-        }
-        bo.writeString("\n");
-        bo.flush();
+    private PriorityQueue<Node> openList;
+    private Comparator<Node> comparator;
+    private int[] path;
+    private int costIncurred;
 
-        for(int i = 0 ; i < N ; ++i) {
-            Vertex curr = vertices.get(i);
-            bo.writeString("No of neighbours of " + curr.toString() + " are : ");
-            bo.writeInt(graph.getEdges(curr).size());
-            bo.writeString("\n");
-            bo.flush();
+    private int visited[];
+
+    public TSP_A_Star(int numOfCities) {
+        this.path = new int[numOfCities];
+        this.visited = new int[numOfCities];
+        for (int i = 0; i < numOfCities; i++) {
+            this.visited[i] = 0;
         }
+
+        openList = new PriorityQueue<Node>(numOfCities);
     }
 
-    static void solve(BufferInput bi, BufferOutput bo) throws IOException {
-        bo.writeString("Enter no.of cities : ");
-        bo.flush();
-        int N = bi.nextInt();
-
-        bo.writeString("Enter minimum edge weight : ");
-        bo.flush();
-        double edgeMin = bi.nextDouble();
-
-        bo.writeString("Enter maximum edge weight : ");
-        bo.flush();
-        double edgeMax = bi.nextDouble();
-
-        Graph graph = Graph.randomGraph(N, edgeMin, edgeMax);
-        printGraph(bo, graph);
-
-        //Starting Search from here
-        PriorityQueue<State> open = new PriorityQueue<>();
-        State start = new State(graph);
-        open.add(start);
-
-        while(!open.isEmpty()) {
-            State n = open.poll();
-            if(n.isGoalState()) {
-                bo.writeString("Goal state reached\n");
-                printGraph(bo, n.getGraph());
-                break;
-            } else {
-                //expand(n);
-            }
-        }
-    }
-
-    public static void main(String[] args) throws IOException {
-        BufferInput bufferInput = new BufferInput();
-        BufferOutput bufferOutput = new BufferOutput();
-
-        int T = bufferInput.nextInt();
-        while(T-- > 0)
-        TSP_A_Star.solve(bufferInput, bufferOutput);
-
-        bufferOutput.flush();
-        bufferOutput.close();
-        bufferInput.close();
-    }
-
-    static class BufferInput {
-
-        final private int BUFFER_SIZE = 1 << 16;
-        private DataInputStream din;
-        private byte[] buffer;
-        private int bufferPointer, bytesRead;
-
-        public BufferInput() {
-            din = new DataInputStream(System.in);
-            buffer = new byte[BUFFER_SIZE];
-            bufferPointer = bytesRead = 0;
-        }
-
-        public String readLine() throws IOException {
-            byte[] buf = new byte[64];
-            int cnt = 0, c;
-            while ((c = read()) != -1) {
-                if (c == '\n') {
-                    break;
-                }
-                buf[cnt++] = (byte) c;
-            }
-            return new String(buf, 0, cnt);
-        }
-
-        public String nextString() throws IOException {
-            byte c = read();
-            while (Character.isWhitespace(c)) {
-                c = read();
-            }
-            StringBuilder builder = new StringBuilder();
-            builder.append((char) c);
-            c = read();
-            while (!Character.isWhitespace(c)) {
-                builder.append((char) c);
-                c = read();
-            }
-            return builder.toString();
-        }
-
-        public int nextInt() throws IOException {
-            int ret = 0;
-            byte c = read();
-            while (c <= ' ') {
-                c = read();
-            }
-            boolean neg = (c == '-');
-            if (neg) {
-                c = read();
-            }
-            do {
-                ret = ret * 10 + c - '0';
-            } while ((c = read()) >= '0' && c <= '9');
-
-            if (neg) {
-                return -ret;
-            }
-            return ret;
-        }
-
-        public int[] nextIntArray(int n) throws IOException {
-            int arr[] = new int[n];
-            for (int i = 0; i < n; i++) {
-                arr[i] = nextInt();
-            }
-            return arr;
-        }
-
-        public long nextLong() throws IOException {
-            long ret = 0;
-            byte c = read();
-            while (c <= ' ') {
-                c = read();
-            }
-            boolean neg = (c == '-');
-            if (neg) {
-                c = read();
-            }
-            do {
-                ret = ret * 10 + c - '0';
-            } while ((c = read()) >= '0' && c <= '9');
-            if (neg) {
-                return -ret;
-            }
-            return ret;
-        }
-
-        public long[] nextLongArray(int n) throws IOException {
-            long arr[] = new long[n];
-            for (int i = 0; i < n; i++) {
-                arr[i] = nextLong();
-            }
-            return arr;
-        }
-
-        public char nextChar() throws IOException {
-            byte c = read();
-            while (Character.isWhitespace(c)) {
-                c = read();
-            }
-            return (char) c;
-        }
-
-        public double nextDouble() throws IOException {
-            double ret = 0, div = 1;
-            byte c = read();
-            while (c <= ' ') {
-                c = read();
-            }
-            boolean neg = (c == '-');
-            if (neg) {
-                c = read();
-            }
-
-            do {
-                ret = ret * 10 + c - '0';
-            } while ((c = read()) >= '0' && c <= '9');
-
-            if (c == '.') {
-                while ((c = read()) >= '0' && c <= '9') {
-                    ret += (c - '0') / (div *= 10);
+    public void solve(int[][] cost, int numOfCities, int startCity) {
+        int numOfVisited = 1;
+        int currentCity = startCity;
+        visited[currentCity] = numOfVisited++;
+        while (numOfVisited <= numOfCities) {
+            for (int i = 0; i < numOfCities; i++) {
+                if (i != currentCity && cost[currentCity][i] < Integer.MAX_VALUE) {
+                    if (visited[i] == 0) {                //i.e. city is not visited
+                        MSTKruskal tempSpanTree = new MSTKruskal(cost, visited, numOfCities);
+                        int hCost = tempSpanTree.getTotalCost();
+                        Node tempNode = new Node(i, (hCost + cost[currentCity][i]));
+                        openList.add(tempNode);
+                    }
                 }
             }
-
-            if (neg) {
-                return -ret;
-            }
-            return ret;
+            currentCity = openList.poll().cityId;
+            visited[currentCity] = numOfVisited++;
         }
-
-        public double[] nextDoubleArray(int n) throws IOException {
-            double arr[] = new double[n];
-            for (int i = 0; i < n; i++) {
-                arr[i] = nextDouble();
-            }
-            return arr;
-        }
-
-        private void fillBuffer() throws IOException {
-            bytesRead = din.read(buffer, bufferPointer = 0, BUFFER_SIZE);
-            if (bytesRead == -1) {
-                buffer[0] = -1;
-            }
-        }
-
-        private byte read() throws IOException {
-            if (bufferPointer == bytesRead) {
-                fillBuffer();
-            }
-            return buffer[bufferPointer++];
-        }
-
-        public void close() throws IOException {
-            if (din == null) {
-                return;
-            }
-            din.close();
-        }
+        System.out.println(Arrays.toString(visited));
+        this.calPath(cost);
     }
 
-    static class BufferOutput {
-
-        private DataOutputStream dout;
-        final private int BUFFER_SIZE = 1 << 16;
-        private byte[] buffer;
-        private int pointer = 0;
-
-        public BufferOutput() {
-            buffer = new byte[BUFFER_SIZE];
-            dout = new DataOutputStream(System.out);
+    private void calPath(int cost[][]) {
+        for (int i = 1; i <= this.visited.length; i++) {
+            for (int j = 0; j < this.visited.length; j++)
+                if (visited[j] == i) {
+                    this.path[i - 1] = j + 1;
+                }
         }
-
-        public BufferOutput(OutputStream out) {
-
-            buffer = new byte[BUFFER_SIZE];
-            dout = new DataOutputStream(out);
+        System.out.println(Arrays.toString(path));
+        long tempTotalCost = 0;
+        for (int i = 0; i < this.visited.length - 1; i++) {
+            if(path[i] != 0 && path[i + 1] != 0) tempTotalCost += cost[path[i] - 1][path[i + 1] - 1];
         }
+        if (tempTotalCost > Integer.MAX_VALUE)
+            costIncurred = Integer.MAX_VALUE;
+        else
+            costIncurred = (int) tempTotalCost;
+    }
 
-        public void writeBytes(byte arr[]) throws IOException {
-
-            int bytesToWrite = arr.length;
-
-            if (pointer + bytesToWrite >= BUFFER_SIZE) {
-                flush();
-            }
-
-            for (int i = 0; i < bytesToWrite; i++) {
-                buffer[pointer++] = arr[i];
-            }
+    public void printPath() {
+        for (int i = 0; i < this.path.length; i++) {
+            System.out.print(path[i] + " ");
         }
-
-        public void writeString(String str) throws IOException {
-            writeBytes(str.getBytes());
-        }
-
-        public void writeInt(int n) throws IOException {
-            writeString(String.valueOf(n));
-        }
-
-        public void writeLong(long l) throws IOException {
-            writeString(String.valueOf(l));
-        }
-
-        public void writeDouble(double d) throws IOException {
-            writeString(String.valueOf(d));
-        }
-
-        public void flush() throws IOException {
-            dout.write(buffer, 0, pointer);
-            dout.flush();
-            pointer = 0;
-        }
-
-        public void close() throws IOException {
-            dout.close();
-        }
+        System.out.print("(" + this.costIncurred + ")");
     }
 }
 
-class State implements Comparable<State>{
-    private Graph graph;
-    private ArrayList<Vertex> traversed;
-    private double g;
-    private double h;
-    private double f;
+class Node implements Comparable<Node>{
+    int cityId;
+    int cost;
 
-    public State(Graph graph) {
-        this.graph = graph;
-        traversed = new ArrayList<>();
-        g = h = f = 0.0;
+    public Node(int cId, int c) {
+        this.cityId = cId;
+        this.cost = c;
     }
-
-    public State(Graph graph, ArrayList<Vertex> traversed) {
-        this.graph = graph;
-        this.traversed = traversed;
-        g = h = f = 0.0;
-    }
-
-    public Graph getGraph() {return graph;}
-    public void setGraph(Graph graph) {this.graph = graph;}
-
-    public ArrayList<Vertex> getTraversedVertices() {return traversed;}
-    public void setTraversedVertices(ArrayList<Vertex> traversed) {this.traversed = traversed;}
-
-    public double getG() {return g;}
-    public void setG(double g) {this.g = g;}
-
-    public double getH() {return h;}
-    public void setH(double h) {this.h = h;}
-
-    public double getF() {return f;}
-    public void setF(double f) {this.f = f;}
 
     @Override
-    public int compareTo(State state) {
-        if(f < state.getF()) return -1;
-        else if(f == state.getF()) return 0;
-        else return 1;
-    }
-
-    public boolean isGoalState() {
-        return traversed.containsAll(graph.getVertices());
-    }
-
-    public void calculateHeuristic() {
-        
+    public int compareTo(Node node) {
+        return cost - node.cost;
     }
 }
