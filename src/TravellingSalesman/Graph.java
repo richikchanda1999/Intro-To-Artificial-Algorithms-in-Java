@@ -1,6 +1,7 @@
 package TravellingSalesman;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Random;
 
 public class Graph {
@@ -62,13 +63,19 @@ public class Graph {
 
     public void addEdge(Vertex a, Vertex b, double weight) {
         Edge<Vertex, Vertex> newEdge = new Edge<>(a, b, weight);
-        if (!edges.contains(newEdge) && !edges.contains(new Edge<>(b, a, weight)))
+        Edge<Vertex, Vertex> newEdgeRev = new Edge<>(a, b, weight);
+        if (!edges.contains(newEdge) && !edges.contains(newEdgeRev)) {
             edges.add(newEdge);
+            edges.add(newEdgeRev);
+        }
     }
 
     public void addEdge(Edge<Vertex, Vertex> edge) {
-        if (!edges.contains(edge) && !edges.contains(new Edge<>(edge.getSecond(), edge.getFirst(), edge.getWeight())))
+        Edge<Vertex, Vertex> rev = new Edge<>(edge.getSecond(), edge.getFirst(), edge.getWeight());
+        if (!edges.contains(edge) && !edges.contains(rev)) {
             edges.add(edge);
+            edges.add(rev);
+        }
     }
 
     public void removeEdge(Edge<Vertex, Vertex> edge) {
@@ -89,6 +96,14 @@ public class Graph {
         return new Graph(verticesNew, edgesNew);
     }
 
+    public Graph excluding(ArrayList<Vertex> vertices) {
+        Graph g = copy();
+        for(int i = 0 ; i < vertices.size() ; ++i) {
+            g.removeVertex(vertices.get(i));
+        }
+        return g;
+    }
+
     public static Graph randomGraph(int N, double edgeMin, double edgeMax) {
         Graph g = new Graph();
         ArrayList<Vertex> vertices = g.getVertices();
@@ -106,13 +121,23 @@ public class Graph {
                 s = s.substring(0, s.indexOf('.') + 3);
                 edgeWeight = Double.parseDouble(s);
                 Vertex j_v = vertices.get(j - 1);
-                Edge<Vertex, Vertex> edge1 = new Edge<>(i_v, j_v, edgeWeight);
-                Edge<Vertex, Vertex> edge2 = new Edge<>(j_v, i_v, edgeWeight);
-                edges.add(edge1);
-                edges.add(edge2);
+                Edge<Vertex, Vertex> edge = new Edge<>(i_v, j_v, edgeWeight);
+                g.addEdge(edge);
             }
         }
         return g;
+    }
+
+    public double getTotalWeight(Graph graph) {
+        double total = 0.0;
+        ArrayList<Edge<Vertex, Vertex>> edges = graph.getEdges();
+        Collections.sort(edges);
+
+        for(int i = 0 ; i < edges.size() ; i += 2) {
+            Edge edge = edges.get(i);
+            total += edge.getWeight();
+        }
+        return total;
     }
 }
 
@@ -153,7 +178,9 @@ class Edge<P, T> implements Comparable<Edge<P, T>> {
 
     @Override
     public int compareTo(Edge edge) {
-        return (int) (weight - edge.getWeight());
+        if(weight < edge.getWeight()) return -1;
+        else if(weight == edge.getWeight()) return 0;
+        else return 1;
     }
 
     @Override

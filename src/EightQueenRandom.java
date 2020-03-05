@@ -1,82 +1,129 @@
-package TravellingSalesman;
-
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.PriorityQueue;
+import java.util.Arrays;
+import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
-public class TSP_A_Star {
-    static void printGraph(BufferOutput bo, Graph graph) throws IOException{
-        ArrayList<Vertex> vertices = graph.getVertices();
-        int N = vertices.size();
-        bo.writeString("Vertices : " + vertices);
-        bo.flush();
-        ArrayList<Edge<Vertex, Vertex>> edges = graph.getEdges();
-        Collections.sort(edges);
-        bo.writeString("\nEdges : \n");
-        bo.flush();
-        for(int i = 0 ; i < edges.size() ; ++i) {
-            Edge edge = edges.get(i);
-            bo.writeString(edge.toString());
-            bo.writeString("\n");
-            bo.flush();
-        }
-        bo.writeString("\n");
-        bo.flush();
+public class EightQueenRandom {
+    private int MAX;
 
-        for(int i = 0 ; i < N ; ++i) {
-            Vertex curr = vertices.get(i);
-            bo.writeString("No of neighbours of " + curr.toString() + " are : ");
-            bo.writeInt(graph.getEdges(curr).size());
-            bo.writeString("\n");
-            bo.flush();
-        }
+    public EightQueenRandom(int MAX) {
+        this.MAX = MAX;
     }
 
-    static void solve(BufferInput bi, BufferOutput bo) throws IOException {
-        bo.writeString("Enter no.of cities : ");
-        bo.flush();
-        int N = bi.nextInt();
+    // Implementing Fisher–Yates shuffle
+    public int[] shuffleArray(int[] ar)
+    {
+        // If running on Java 6 or older, use `new Random()` on RHS here
+        Random rnd = ThreadLocalRandom.current();
+        for (int i = ar.length - 1; i > 0; i--)
+        {
+            int index = rnd.nextInt(i + 1);
+            // Simple swap
+            int a = ar[index];
+            ar[index] = ar[i];
+            ar[i] = a;
+        }
+        return ar;
+    }
 
-        bo.writeString("Enter minimum edge weight : ");
-        bo.flush();
-        double edgeMin = bi.nextDouble();
-
-        bo.writeString("Enter maximum edge weight : ");
-        bo.flush();
-        double edgeMax = bi.nextDouble();
-
-        Graph graph = Graph.randomGraph(N, edgeMin, edgeMax);
-        printGraph(bo, graph);
-
-        //Starting Search from here
-        PriorityQueue<State> open = new PriorityQueue<>();
-        State start = new State(graph);
-        open.add(start);
-
-        while(!open.isEmpty()) {
-            State n = open.poll();
-            if(n.isGoalState()) {
-                bo.writeString("Goal state reached\n");
-                printGraph(bo, n.getGraph());
-                break;
-            } else {
-                //expand(n);
+    public boolean isGoal(int[] arr) {
+        for(int i = 0 ; i < MAX ; ++i) {
+            for(int j = 0 ; j < MAX ; ++j) {
+                if(i == j) continue;
+                if(arr[i] == arr[j]) return false;
+                if(Math.abs(arr[i] - arr[j]) == Math.abs(i - j)) return false;
             }
         }
+        return true;
+    }
+
+    public long solve(BufferInput bi, BufferOutput bo) throws IOException {
+        int arr[] = new int[MAX];
+        for(int i = 1 ; i <= MAX ; ++i) arr[i - 1] = i;
+        //arr = shuffleArray(arr);
+
+        long count = 0;
+        int prev_i = -1, prev_j = -1;
+        boolean modified = true, isGoalState = isGoal(arr);
+        while(true) {
+            if(modified) {
+                //bo.writeString(Arrays.toString(arr));
+                //bo.writeString("\n");
+                isGoalState = isGoal(arr);
+                ++count;
+            }
+            if(isGoalState) break;
+            Random random = ThreadLocalRandom.current();
+            int i = random.nextInt(MAX);
+            int j = random.nextInt(MAX);
+//            do {
+//                j = random.nextInt(MAX);
+//                if(j != i) break;
+//            }while(true);
+
+//            while(j == i) {
+//                Random rnd = new Random();
+//                j = (j + rnd.nextInt(MAX)) % MAX;
+//            }
+
+            while(prev_i == i && prev_j == j) {
+                Random rnd = new Random();
+                int add = rnd.nextInt(MAX);
+                i = (i + add) % MAX;
+                j = (j + add) % MAX;
+            }
+            if(prev_i != i || prev_j != j) {
+                int temp = arr[i];
+                arr[i] = arr[j];
+                arr[j] = temp;
+                modified = true;
+                prev_i = i;
+                prev_j = j;
+            } else modified = false;
+        }
+
+//        bo.writeString(Arrays.toString(arr));
+//        bo.writeString("\n");
+//        bo.writeString("Count : ");
+//        bo.writeLong(count);
+//        bo.writeString("\n");
+//        bo.flush();
+
+        return count;
     }
 
     public static void main(String[] args) throws IOException {
         BufferInput bufferInput = new BufferInput();
         BufferOutput bufferOutput = new BufferOutput();
 
-        int T = bufferInput.nextInt();
-        while(T-- > 0)
-        TSP_A_Star.solve(bufferInput, bufferOutput);
+//        int T = bufferInput.nextInt();
+//        while(T-- > 0) {
+//            bufferOutput.writeString("Enter no. of queens : ");
+//            bufferOutput.flush();
+//            int N = bufferInput.nextInt();
+//
+//            EightQueenRandom eqr = new EightQueenRandom(N);
+//            eqr.solve(bufferInput, bufferOutput);
+//        }
+
+        int MAX = 10, samples = 1000;
+        for(int i = 4 ; i <= MAX ; ++i) {
+            double avg = 0.0;
+            for(int j = 1 ; j <= samples ; ++j) {
+                EightQueenRandom eqr = new EightQueenRandom(i);
+                avg += eqr.solve(bufferInput, bufferOutput);
+            }
+            avg /= samples;
+            bufferOutput.writeString("Average for ");
+            bufferOutput.writeInt(i);
+            bufferOutput.writeString(" queens : ");
+            bufferOutput.writeDouble(avg);
+            bufferOutput.writeString("\n");
+            bufferOutput.flush();
+        }
 
         bufferOutput.flush();
         bufferOutput.close();
@@ -299,55 +346,5 @@ public class TSP_A_Star {
         public void close() throws IOException {
             dout.close();
         }
-    }
-}
-
-class State implements Comparable<State>{
-    private Graph graph;
-    private ArrayList<Vertex> traversed;
-    private double g;
-    private double h;
-    private double f;
-
-    public State(Graph graph) {
-        this.graph = graph;
-        traversed = new ArrayList<>();
-        g = h = f = 0.0;
-    }
-
-    public State(Graph graph, ArrayList<Vertex> traversed) {
-        this.graph = graph;
-        this.traversed = traversed;
-        g = h = f = 0.0;
-    }
-
-    public Graph getGraph() {return graph;}
-    public void setGraph(Graph graph) {this.graph = graph;}
-
-    public ArrayList<Vertex> getTraversedVertices() {return traversed;}
-    public void setTraversedVertices(ArrayList<Vertex> traversed) {this.traversed = traversed;}
-
-    public double getG() {return g;}
-    public void setG(double g) {this.g = g;}
-
-    public double getH() {return h;}
-    public void setH(double h) {this.h = h;}
-
-    public double getF() {return f;}
-    public void setF(double f) {this.f = f;}
-
-    @Override
-    public int compareTo(State state) {
-        if(f < state.getF()) return -1;
-        else if(f == state.getF()) return 0;
-        else return 1;
-    }
-
-    public boolean isGoalState() {
-        return traversed.containsAll(graph.getVertices());
-    }
-
-    public void calculateHeuristic() {
-        
     }
 }
