@@ -16,7 +16,7 @@ public class EightQueenRandom {
     // Implementing Fisher–Yates shuffle
     public int[] shuffleArray(int[] ar)
     {
-        // If running on Java 6 or older, use `new Random()` on RHS here
+        // If running on Java 6 or older, use `new RandomGenerators()` on RHS here
         Random rnd = ThreadLocalRandom.current();
         for (int i = ar.length - 1; i > 0; i--)
         {
@@ -65,7 +65,7 @@ public class EightQueenRandom {
 //            }while(true);
 
 //            while(j == i) {
-//                Random rnd = new Random();
+//                RandomGenerators rnd = new RandomGenerators();
 //                j = (j + rnd.nextInt(MAX)) % MAX;
 //            }
 
