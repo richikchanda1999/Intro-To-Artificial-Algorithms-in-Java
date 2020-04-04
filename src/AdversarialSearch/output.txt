@@ -1,0 +1,82 @@
+----------------- Welcome to the game of sticks -----------------
+How many sticks are there on the board initally? 14
+Options:
+Play against the computer (1)
+Watch the computers play (2)
+Exit (3)
+Which option do you take? 2
+Player 2 won the toss
+AI picked 1 sticks
+Remaining sticks --- 13
+AI picked 1 sticks
+Remaining sticks --- 12
+AI picked 1 sticks
+Remaining sticks --- 11
+AI picked 1 sticks
+Remaining sticks --- 10
+AI picked 1 sticks
+Remaining sticks --- 9
+AI picked 1 sticks
+Remaining sticks --- 8
+AI picked 1 sticks
+Remaining sticks --- 7
+AI picked 1 sticks
+Remaining sticks --- 6
+AI picked 1 sticks
+Remaining sticks --- 5
+AI picked 1 sticks
+Remaining sticks --- 4
+AI picked 3 sticks
+Remaining sticks --- 1
+AI picked 1 sticks
+Remaining sticks --- 0
+Player 2 won!
+Player 1 lost!
+----------------- Welcome to the game of sticks -----------------
+How many sticks are there on the board initally? 21
+Options:
+Play against the computer (1)
+Watch the computers play (2)
+Exit (3)
+Which option do you take? 2
+Player 2 won the toss
+AI picked 1 sticks
+Remaining sticks --- 20
+AI picked 1 sticks
+Remaining sticks --- 19
+AI picked 1 sticks
+Remaining sticks --- 18
+AI picked 1 sticks
+Remaining sticks --- 17
+AI picked 1 sticks
+Remaining sticks --- 16
+AI picked 1 sticks
+Remaining sticks --- 15
+AI picked 1 sticks
+Remaining sticks --- 14
+AI picked 1 sticks
+Remaining sticks --- 13
+AI picked 1 sticks
+Remaining sticks --- 12
+AI picked 1 sticks
+Remaining sticks --- 11
+AI picked 1 sticks
+Remaining sticks --- 10
+AI picked 1 sticks
+Remaining sticks --- 9
+AI picked 1 sticks
+Remaining sticks --- 8
+AI picked 1 sticks
+Remaining sticks --- 7
+AI picked 1 sticks
+Remaining sticks --- 6
+AI picked 1 sticks
+Remaining sticks --- 5
+AI picked 1 sticks
+Remaining sticks --- 4
+AI picked 3 sticks
+Remaining sticks --- 1
+AI picked 1 sticks
+Remaining sticks --- 0
+Player 1 won!
+Player 2 lost!
